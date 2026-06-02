@@ -9,19 +9,20 @@ class Server {
     constructor() {
         this.app = express();
         this.port = process.env.PORT || 8080;
+        this.app.set('trust proxy', 1);
 
         this.authPath = "/api/auth";
         this.usersPath = "/api/users";
         this.productsPath = "/api/products";
         this.ordersPath = "/api/orders"; 
 
-        this.connectDatabase();
+        this.dbReady = connectDB().catch((error) => {
+            this.dbError = error;
+            throw error;
+        });
+
         this.middlewares();
         this.routes();
-    }
-
-    async connectDatabase() {
-        await connectDB();
     }
 
     middlewares() {
@@ -85,6 +86,25 @@ class Server {
 
         this.app.use(express.json({ limit: '10mb' }));
         this.app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+
+        // Las rutas de API esperan la conexión a MongoDB antes de ejecutar consultas.
+        this.app.use('/api', async (req, res, next) => {
+            if (req.path === '/debug-db') {
+                return next();
+            }
+
+            try {
+                await this.dbReady;
+                next();
+            } catch (error) {
+                console.error(' Error esperando conexión a MongoDB:', error.message);
+                res.status(503).json({
+                    ok: false,
+                    msg: 'Base de datos no disponible',
+                    error: error.message
+                });
+            }
+        });
 
         this.app.use((req, res, next) => {
             console.log(`${req.method} ${req.path} - ${new Date().toLocaleTimeString()}`);

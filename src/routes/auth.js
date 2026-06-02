@@ -11,6 +11,7 @@ const router = Router();
 const authLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutos
     max: 15, // Máximo 15 intentos por IP
+    keyGenerator: (req) => req.ip || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown',
     message: {
         ok: false,
         msg: 'Demasiadas peticiones desde esta dirección IP. Inténtalo de nuevo en 15 minutos.'

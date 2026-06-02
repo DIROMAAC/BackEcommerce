@@ -3,13 +3,22 @@ const mongoose = require("mongoose");
 const connectDB = async () => {
     try {
         console.log(" Intentando conectar a MongoDB...");
-        
-        // CONEXIÓN DINÁMICA A MONGODB (LOCAL O REMOTO EN ATLAS)
-        const dbUri = process.env.MONGO_URI || process.env.MONGODB_URI || "mongodb://localhost:27017/proyecto_db";
-        const isAtlas = (process.env.MONGO_URI || process.env.MONGODB_URI) ? "MongoDB Atlas (Remoto)" : "MongoDB Local";
+
+        // En producción debe existir una URI remota; en local se permite fallback a MongoDB local.
+        const remoteUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+        const isProduction = process.env.VERCEL || process.env.NODE_ENV === "production";
+        const dbUri = remoteUri || (!isProduction ? "mongodb://localhost:27017/proyecto_db" : null);
+
+        if (!dbUri) {
+            throw new Error("Falta configurar MONGO_URI o MONGODB_URI en producción");
+        }
+
+        const isAtlas = remoteUri ? "MongoDB Atlas (Remoto)" : "MongoDB Local";
         
         console.log(` Intentando conectar a ${isAtlas}...`);
-        await mongoose.connect(dbUri);
+        await mongoose.connect(dbUri, {
+            serverSelectionTimeoutMS: 10000
+        });
         
         console.log(" Conexión exitosa con MongoDB");
         
@@ -21,7 +30,7 @@ const connectDB = async () => {
         console.log(" Asegúrate de que MongoDB esté corriendo:");
         console.log("   Windows: net start MongoDB");
         console.log("   Mac/Linux: sudo systemctl start mongod");
-        process.exit(1);
+        throw error;
     }
 };
 
