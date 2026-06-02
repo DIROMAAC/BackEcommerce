@@ -7,7 +7,7 @@ const validateFields = (req, res, next) => {
     const errors = validationResult(req);
     
     if (!errors.isEmpty()) {
-        console.log('❌ Petición rechazada por errores de validación:', errors.mapped());
+        console.log('Petición rechazada por errores de validación:', errors.mapped());
         return res.status(400).json({
             ok: false,
             msg: 'Error de validación en los campos',

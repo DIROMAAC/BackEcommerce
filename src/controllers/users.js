@@ -1,11 +1,11 @@
 const { response, request } = require('express');
 const User = require('../models/user');
 
-// ✅ GET - Obtener perfil del usuario
+// GET - Obtener perfil del usuario
 const getUserProfile = async (req = request, res = response) => {
     try {
         const userId = req.uid;
-        console.log('👤 Obteniendo perfil del usuario:', userId);
+        console.log('Obteniendo perfil del usuario:', userId);
         
         const user = await User.findById(userId).select('-password');
         
@@ -16,8 +16,8 @@ const getUserProfile = async (req = request, res = response) => {
             });
         }
 
-        console.log('✅ Perfil encontrado:', user.email);
-        console.log('📍 Direcciones del usuario:', user.addresses.length);
+        console.log('Perfil encontrado:', user.email);
+        console.log('Direcciones del usuario:', user.addresses.length);
 
         res.status(200).json({
             ok: true,
@@ -38,7 +38,7 @@ const getUserProfile = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error('❌ Error al obtener perfil:', error);
+        console.error('Error al obtener perfil:', error);
         res.status(500).json({
             ok: false,
             msg: 'Error interno del servidor',
@@ -47,13 +47,13 @@ const getUserProfile = async (req = request, res = response) => {
     }
 };
 
-// ✅ PUT - Actualizar perfil del usuario
+// PUT - Actualizar perfil del usuario
 const updateUserProfile = async (req = request, res = response) => {
     try {
         const userId = req.uid;
         const { firstName, lastName, phone, birthDate, preferences } = req.body;
 
-        console.log('✏️ Actualizando perfil del usuario:', userId);
+        console.log('Actualizando perfil del usuario:', userId);
 
         const user = await User.findById(userId);
         
@@ -73,7 +73,7 @@ const updateUserProfile = async (req = request, res = response) => {
         }
 
         await user.save();
-        console.log('✅ Perfil actualizado exitosamente');
+        console.log('Perfil actualizado exitosamente');
 
         res.status(200).json({
             ok: true,
@@ -93,7 +93,7 @@ const updateUserProfile = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error('❌ Error al actualizar perfil:', error);
+        console.error('Error al actualizar perfil:', error);
         res.status(500).json({
             ok: false,
             msg: 'Error interno del servidor',
@@ -102,14 +102,14 @@ const updateUserProfile = async (req = request, res = response) => {
     }
 };
 
-// ✅ POST - Añadir dirección
+// POST - Añadir dirección
 const addAddress = async (req = request, res = response) => {
     try {
         const userId = req.uid;
         const { name, address, city, state, zipCode, country, isDefault } = req.body;
 
-        console.log('🏠 Añadiendo dirección para usuario:', userId);
-        console.log('📦 Datos recibidos:', { name, address, city, zipCode });
+        console.log('Anadiendo direccion para usuario:', userId);
+        console.log('Datos recibidos:', { name, address, city, zipCode });
 
         if (!name || !address || !city || !zipCode) {
             return res.status(400).json({
@@ -148,8 +148,8 @@ const addAddress = async (req = request, res = response) => {
         user.addresses.push(newAddress);
         await user.save();
 
-        console.log('✅ Dirección añadida exitosamente');
-        console.log('📍 Total direcciones:', user.addresses.length);
+        console.log('Direccion anadida exitosamente');
+        console.log('Total direcciones:', user.addresses.length);
 
         res.status(201).json({
             ok: true,
@@ -158,7 +158,7 @@ const addAddress = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error('❌ Error al añadir dirección:', error);
+        console.error('Error al anadir direccion:', error);
         res.status(500).json({
             ok: false,
             msg: 'Error interno del servidor',
@@ -167,14 +167,14 @@ const addAddress = async (req = request, res = response) => {
     }
 };
 
-// ✅ PUT - Actualizar dirección
+// PUT - Actualizar dirección
 const updateAddress = async (req = request, res = response) => {
     try {
         const userId = req.uid;
         const { addressId } = req.params;
         const { name, address, city, state, zipCode, country, isDefault } = req.body;
 
-        console.log('✏️ Actualizando dirección:', addressId);
+        console.log('Actualizando direccion:', addressId);
 
         const user = await User.findById(userId);
         
@@ -210,7 +210,7 @@ const updateAddress = async (req = request, res = response) => {
 
         await user.save();
 
-        console.log('✅ Dirección actualizada exitosamente');
+        console.log('Direccion actualizada exitosamente');
 
         res.status(200).json({
             ok: true,
@@ -219,7 +219,7 @@ const updateAddress = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error('❌ Error al actualizar dirección:', error);
+        console.error('Error al actualizar direccion:', error);
         res.status(500).json({
             ok: false,
             msg: 'Error interno del servidor',
@@ -228,13 +228,13 @@ const updateAddress = async (req = request, res = response) => {
     }
 };
 
-// ✅ DELETE - Eliminar dirección
+// DELETE - Eliminar dirección
 const deleteAddress = async (req = request, res = response) => {
     try {
         const userId = req.uid;
         const { addressId } = req.params;
 
-        console.log('🗑️ Eliminando dirección:', addressId);
+        console.log('Eliminando direccion:', addressId);
 
         const user = await User.findById(userId);
         
@@ -265,7 +265,7 @@ const deleteAddress = async (req = request, res = response) => {
         user.addresses.pull(addressId);
         await user.save();
 
-        console.log('✅ Dirección eliminada exitosamente');
+        console.log('Direccion eliminada exitosamente');
 
         res.status(200).json({
             ok: true,
@@ -274,7 +274,7 @@ const deleteAddress = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error('❌ Error al eliminar dirección:', error);
+        console.error('Error al eliminar direccion:', error);
         res.status(500).json({
             ok: false,
             msg: 'Error interno del servidor',
@@ -283,7 +283,7 @@ const deleteAddress = async (req = request, res = response) => {
     }
 };
 
-// ✅ Métodos básicos para métodos de pago (simplificados)
+// Métodos básicos para métodos de pago (simplificados)
 const addPaymentMethod = async (req = request, res = response) => {
     res.status(501).json({
         ok: false,
@@ -298,7 +298,7 @@ const deletePaymentMethod = async (req = request, res = response) => {
     });
 };
 
-// ✅ Métodos de admin (simplificados)
+// Métodos de admin (simplificados)
 const getAllUsers = async (req = request, res = response) => {
     res.status(501).json({
         ok: false,

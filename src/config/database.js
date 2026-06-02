@@ -5,8 +5,8 @@ const connectDB = async () => {
         console.log(" Intentando conectar a MongoDB...");
         
         // CONEXIÓN DINÁMICA A MONGODB (LOCAL O REMOTO EN ATLAS)
-        const dbUri = process.env.MONGO_URI || "mongodb://localhost:27017/proyecto_db";
-        const isAtlas = process.env.MONGO_URI ? "MongoDB Atlas (Remoto)" : "MongoDB Local";
+        const dbUri = process.env.MONGO_URI || process.env.MONGODB_URI || "mongodb://localhost:27017/proyecto_db";
+        const isAtlas = (process.env.MONGO_URI || process.env.MONGODB_URI) ? "MongoDB Atlas (Remoto)" : "MongoDB Local";
         
         console.log(` Intentando conectar a ${isAtlas}...`);
         await mongoose.connect(dbUri);

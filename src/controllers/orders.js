@@ -9,7 +9,7 @@ const createOrder = async (req = request, res = response) => {
         const { items, shippingAddress, paymentInfo, shippingMethod = 'standard' } = req.body;
         const userId = req.uid;
 
-        console.log('🛒 Creando nueva orden para usuario:', userId);
+        console.log('Creando nueva orden para usuario:', userId);
 
         // Validar datos requeridos
         if (!items || !Array.isArray(items) || items.length === 0) {
@@ -367,7 +367,7 @@ const updateOrderStatus = async (req = request, res = response) => {
         const { orderId } = req.params;
         const { status, trackingNumber, adminNotes } = req.body;
 
-        console.log('🔧 Admin actualizando orden:', orderId);
+        console.log('Admin actualizando orden:', orderId);
 
         const order = await Order.findById(orderId);
 
@@ -412,7 +412,7 @@ const updateOrderStatus = async (req = request, res = response) => {
 //  GET - Estadísticas de órdenes (solo admin)
 const getOrderStats = async (req = request, res = response) => {
     try {
-        console.log('📊 Generando estadísticas de órdenes');
+        console.log('Generando estadísticas de órdenes');
 
         const stats = await Order.aggregate([
             {

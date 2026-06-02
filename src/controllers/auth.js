@@ -9,7 +9,7 @@ const generateJWT = (uid, username, role) => {
         const payload = { uid, username, role };
         
         jwt.sign(payload, process.env.SECRET_KEY, {
-            expiresIn: '7d' // ✅ Sesión extendida a 7 días reales (era '160000' ms = 2 min y 40 seg)
+            expiresIn: '7d' // Sesión extendida a 7 días reales (era '160000' ms = 2 min y 40 seg)
         }, (err, token) => {
             if (err) {
                 console.log(err);

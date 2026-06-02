@@ -8,7 +8,7 @@ const mapProductWithId = (product, productType) => ({
     productType: productType || product.productType || (product.gender ? 'clothing' : 'accessory')
 });
 
-// ✅ GET - Obtener todos los productos (CORREGIDO COMPLETAMENTE)
+// GET - Obtener todos los productos (CORREGIDO COMPLETAMENTE)
 const getProducts = async (req = request, res = response) => {
     try {
         const { 
@@ -24,7 +24,7 @@ const getProducts = async (req = request, res = response) => {
             search
         } = req.query;
 
-        console.log('🔍 Parámetros recibidos:', { category, gender, search, limit });
+        console.log('Parametros recibidos:', { category, gender, search, limit });
 
         let products = [];
         
@@ -70,15 +70,15 @@ const getProducts = async (req = request, res = response) => {
             
         } else {
             // TODOS los productos
-            console.log('📦 Obteniendo TODOS los productos...');
+            console.log('Obteniendo TODOS los productos...');
             
             const [clothingProducts, accessoryProducts] = await Promise.all([
                 ClothingProduct.find(baseFilters),
                 AccessoryProduct.find(baseFilters)
             ]);
             
-            console.log(`👔 Productos de ropa encontrados: ${clothingProducts.length}`);
-            console.log(`🎒 Accesorios encontrados: ${accessoryProducts.length}`);
+            console.log(`Productos de ropa encontrados: ${clothingProducts.length}`);
+            console.log(`Accesorios encontrados: ${accessoryProducts.length}`);
             
             const clothingWithType = clothingProducts.map(product => 
                 mapProductWithId(product, 'clothing')
@@ -91,7 +91,7 @@ const getProducts = async (req = request, res = response) => {
             products = [...clothingWithType, ...accessoriesWithType];
         }
 
-        console.log(`📦 Total productos encontrados: ${products.length}`);
+        console.log(`Total productos encontrados: ${products.length}`);
 
         // Aplicar ordenamiento
         if (sortBy === 'price') {
@@ -116,8 +116,8 @@ const getProducts = async (req = request, res = response) => {
         const skip = (page - 1) * limit;
         const paginatedProducts = products.slice(skip, skip + parseInt(limit));
 
-        console.log(`✅ Enviando ${paginatedProducts.length} productos (página ${page})`);
-        console.log('📋 Primeros 3 productos:', paginatedProducts.slice(0, 3).map(p => ({
+        console.log(`Enviando ${paginatedProducts.length} productos (pagina ${page})`);
+        console.log('Primeros 3 productos:', paginatedProducts.slice(0, 3).map(p => ({
             id: p.id,
             name: p.name,
             type: p.productType
@@ -134,7 +134,7 @@ const getProducts = async (req = request, res = response) => {
         });
 
     } catch (error) {
-        console.error('❌ Error al obtener productos:', error);
+        console.error('Error al obtener productos:', error);
         res.status(500).json({
             ok: false,
             msg: 'Error interno del servidor',
@@ -143,7 +143,7 @@ const getProducts = async (req = request, res = response) => {
     }
 };
 
-// ✅ GET - Obtener producto por ID
+// GET - Obtener producto por ID
 const getProductById = async (req = request, res = response) => {
     try {
         const { id } = req.params;
@@ -179,12 +179,12 @@ const getProductById = async (req = request, res = response) => {
     }
 };
 
-// ✅ POST - Crear producto
+// POST - Crear producto
 const createProduct = async (req = request, res = response) => {
     try {
         const { productType, ...productData } = req.body;
         
-        console.log('📝 Creando producto:', { productType, name: productData.name });
+        console.log('Creando producto:', { productType, name: productData.name });
         
         if (!productType || !['clothing', 'accessory'].includes(productType)) {
             return res.status(400).json({
@@ -213,7 +213,7 @@ const createProduct = async (req = request, res = response) => {
         const savedProduct = await newProduct.save();
         const productWithId = mapProductWithId(savedProduct, productType);
 
-        console.log('✅ Producto creado:', productWithId.id);
+        console.log('Producto creado:', productWithId.id);
 
         res.status(201).json({
             ok: true,
@@ -239,13 +239,13 @@ const createProduct = async (req = request, res = response) => {
     }
 };
 
-// ✅ PUT - Actualizar producto
+// PUT - Actualizar producto
 const updateProduct = async (req = request, res = response) => {
     try {
         const { id } = req.params;
         const updateData = req.body;
 
-        console.log('✏️ Actualizando producto:', id);
+        console.log('Actualizando producto:', id);
 
         let product = await ClothingProduct.findById(id);
         let isClothing = true;
@@ -274,7 +274,7 @@ const updateProduct = async (req = request, res = response) => {
         
         const productWithId = mapProductWithId(savedProduct, isClothing ? 'clothing' : 'accessory');
 
-        console.log('✅ Producto actualizado:', productWithId.id);
+        console.log('Producto actualizado:', productWithId.id);
 
         res.status(200).json({
             ok: true,
@@ -300,12 +300,12 @@ const updateProduct = async (req = request, res = response) => {
     }
 };
 
-// ✅ DELETE - Eliminar producto
+// DELETE - Eliminar producto
 const deleteProduct = async (req = request, res = response) => {
     try {
         const { id } = req.params;
         
-        console.log('🗑️ Eliminando producto:', id);
+        console.log('Eliminando producto:', id);
         
         let deletedProduct = await ClothingProduct.findByIdAndDelete(id);
         let productType = 'clothing';
@@ -324,7 +324,7 @@ const deleteProduct = async (req = request, res = response) => {
 
         const deletedProductWithId = mapProductWithId(deletedProduct, productType);
 
-        console.log('✅ Producto eliminado:', deletedProductWithId.id);
+        console.log('Producto eliminado:', deletedProductWithId.id);
 
         res.status(200).json({
             ok: true,
@@ -341,7 +341,7 @@ const deleteProduct = async (req = request, res = response) => {
     }
 };
 
-// ✅ GET - Productos destacados
+// GET - Productos destacados
 const getFeaturedProducts = async (req = request, res = response) => {
     try {
         const { limit = 8 } = req.query;
@@ -379,7 +379,7 @@ const getFeaturedProducts = async (req = request, res = response) => {
     }
 };
 
-// ✅ GET - Productos por categoría
+// GET - Productos por categoría
 const getProductsByCategory = async (req = request, res = response) => {
     try {
         const { category } = req.params;

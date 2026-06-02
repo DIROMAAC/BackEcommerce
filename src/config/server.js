@@ -134,6 +134,67 @@ class Server {
             });
         });
 
+        // Endpoint de diagnóstico de Base de Datos para Producción
+        this.app.get('/api/debug-db', async (req, res) => {
+            const mongoose = require("mongoose");
+            const rawMongoUri = process.env.MONGO_URI || process.env.MONGODB_URI;
+            if (!rawMongoUri) {
+                return res.status(500).json({
+                    ok: false,
+                    msg: 'No se detectó MONGO_URI ni MONGODB_URI en las variables de entorno de Vercel'
+                });
+            }
+
+            const hasQuotes = rawMongoUri.startsWith('"') && rawMongoUri.endsWith('"');
+            const cleanUri = hasQuotes ? rawMongoUri.slice(1, -1) : rawMongoUri;
+
+            // Enmascarar la contraseña por seguridad
+            let maskedUri = cleanUri;
+            try {
+                const parts = cleanUri.split('@');
+                if (parts.length > 1) {
+                    const protocolAndUser = parts[0].split(':');
+                    if (protocolAndUser.length > 2) {
+                        maskedUri = `${protocolAndUser[0]}:${protocolAndUser[1]}:******@${parts[1]}`;
+                    } else {
+                        maskedUri = `${protocolAndUser[0]}:******@${parts[1]}`;
+                    }
+                }
+            } catch (e) {}
+
+            try {
+                console.log(' Probando conexión de depuración...');
+                const conn = await mongoose.createConnection(cleanUri, {
+                    serverSelectionTimeoutMS: 5000 // Esperar máximo 5 segundos
+                }).asPromise();
+                
+                const collections = await conn.db.listCollections().toArray();
+                await conn.close();
+                
+                return res.json({
+                    ok: true,
+                    msg: '¡Conexión de prueba a MongoDB Atlas exitosa!',
+                    hasQuotes,
+                    maskedUri,
+                    collections: collections.map(c => c.name)
+                });
+            } catch (error) {
+                return res.json({
+                    ok: false,
+                    msg: 'Falló la conexión de depuración a MongoDB Atlas',
+                    hasQuotes,
+                    maskedUri,
+                    errorName: error.name,
+                    errorMessage: error.message,
+                    suggestions: [
+                        'Verifica que las credenciales de usuario y contraseña en Vercel sean correctas.',
+                        'Asegúrate de haber permitido el acceso a todas las IPs (0.0.0.0/0) en MongoDB Atlas -> Network Access.',
+                        'Si copiaste las comillas dobles, edita la variable en Vercel para quitárselas.'
+                    ]
+                });
+            }
+        });
+
         // Middleware de manejo de errores
         this.app.use((err, req, res, next) => {
             console.error(' Error:', err);
